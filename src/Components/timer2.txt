@@ -1,0 +1,103 @@
+class Timer2 extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            playing: false,
+            step: 'session',
+            turn: 0,
+            millis: 10,
+            seconds: 0,
+        };
+    };
+
+    componentDidMount(){
+        const seconds = this.props.session
+        this.setState({
+            seconds
+        });
+    };
+
+    // start = (e) => {
+    //     e.preventDefault();
+    //     const totalTurn = (this.props.break + this.props.session)*1000;
+    //     const totalHiit = totalTurn * this.props.repeat;
+    //     let startHiit = setInterval( () => {
+    //         this.startTurn()
+    //     }, totalTurn);
+    //     setTimeout( () => {
+    //         clearInterval(startHiit)
+    //     },totalHiit);
+    // };
+
+    startClick = (e) => {
+        this.startSession();
+    };
+
+    // startTurn = () => {
+    //     const turn = this.state.turn + 1;
+    //     this.setState({
+    //         turn
+    //     });
+    //     setTimeout( () => {
+    //         this.startSession()
+    //     }, 0);
+    //     setTimeout( () => {
+    //         this.startBreak()
+    //     }, this.props.session*1000);
+    // };
+
+    startSession = () => {
+        this.update(10, this.props.session);
+        const turn = this.state.turn + 1;
+        this.setState({
+            turn
+        });
+        let timer = setInterval( () => {
+                this.tick()
+        }, 100);
+        if (this.state.seconds === 0){
+            console.log('go break')
+            clearInterval(timer);
+            this.startBreak();
+        };
+    };
+
+    startBreak = () => {
+        this.update(10, this.props.break);
+        let timer = setInterval ( () => {
+            this.tick()
+        }, 100);
+        if (this.state.seconds === 0 && this.state.turn <= this.props.repeat){
+            clearInterval(timer);
+            this.startSession();
+        };
+    };
+
+    tick = () => {
+        let millis = this.state.millis - 1;
+        let seconds = this.state.seconds;
+        if (millis === 0) {
+            millis = 10;
+            seconds -= 1;
+        };
+        this.update(millis, seconds);
+    };
+
+    update = (millis, seconds) => {
+        this.setState({
+            millis, 
+            seconds
+        });
+    };
+
+    render(){
+        return(
+            <div id="timer">
+                <div id="turn">{this.state.turn}</div>
+                <div id="seconds">{this.state.seconds}</div>
+                <button id="play" onClick={this.startClick}>Play</button>
+                <button id="reinitialise" onClick={this.initialize}>Réinit</button>
+            </div>
+        );
+    };
+};

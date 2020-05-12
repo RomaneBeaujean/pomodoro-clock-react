@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Bangers&family=Boogaloo&family=Chewy&family=Fredericka+the+Great&display=swap');
+
+body {
+    background-color: #1F5D4F;
+    color: white;
+    text-align: center;
+    font-size: 30px;
+}
+
+#container {
+    display: flex;
+    height: 70vh;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Bangers', cursive;
+}
+
+#title {
+    font-size: 70px;
+    margin-bottom: 20px;
+    font-family: 'Boogaloo', cursive;
+}
+
+#parameters {
+    width: 30vw;
+    height: 100%;
+    font-size: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    font-family: 'Chewy', cursive;
+}
+
+h2 {
+    font-size: 20px;
+    color: black;
+    font-family: 'Bangers', cursive;
+}
+
+.btn {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 30px;
+    margin: 15px;
+    background: none;
+    border: none;
+    color: white;
+}
+
+.btn:hover {
+    cursor: pointer;
+    transform: scale(1.5);
+}
+
+button:focus {
+    outline: 0;
+}
+
+#break, #session, #repeat {
+    background-color: #93C9BD;
+    border-radius: 15px;
+    width: 80%;
+    border-radius: 10px;
+}
+
+#chrono {
+    border-radius: 15px;
+    width: 50vw;
+    background-color: #EDE6C0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #48442B;
+}
+
+#time {
+    height: 200px;
+    width: 400px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Orbitron', cursive;
+}
+
+#seconds {
+    font-size: 150px;
+}
+
+#millis {
+    font-size: 100px;
+}
+
+.btn-2{
+    width: 100px;
+    height: 50px;
+    margin: 15px;
+    background-color: #DFC104;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    border-radius: 15px;
+}
+
+#start {
+
+}
+
+#reinitialize {
+
+}
