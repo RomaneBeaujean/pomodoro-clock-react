@@ -1,93 +1,238 @@
 import React from 'react';
+import HitParameters from './HitParameters';
 import Timer from './Timer';
 
 class HitTimer extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            break: 10,
-            session: 20,
+            session: 5,
+            breakTime: 5,
             repeat: 2,
+            running: false,
+            step: 'session',
+            seconds: 5,
+            millis: 10,
+            turn: 1,
+            finish: false,
         };
     };
 
+    //Fonctions de paramétrages du hiit
+
     incrementSession = () => {
-        const session = this.state.session + 1;
-        this.setState({session})
+        if (!this.state.running) {
+            const session = this.state.session + 1;
+            this.initialize(session, 'session');
+            this.setState({ session });
+        };
     };
 
     decrementSession = () => {
-        const session = this.state.session - 1;
-        if (session>0){
-            this.setState({session});
-        }
-    };
-
-    incrementBreak = () => {
-        const breakTime = this.state.break + 1;
-        this.setState({break: breakTime});
-    };
-
-    decrementBreak = () => {
-        const breakTime = this.state.break - 1;
-        if (breakTime >= 0) {
-        this.setState({break: breakTime});            
-        }
-    };
-
-    incrementRepeat = () => {
-        const repeat = this.state.repeat + 1;
-        this.setState({repeat});
-    };
-
-    decrementRepeat = () => {
-        const repeat = this.state.repeat - 1;
-        if (repeat > 0){
-            this.setState({repeat});
+        if (!this.state.running) {
+            const session = this.state.session - 1;
+            if (session > 0) {
+                this.initialize(session, 'session');
+                this.setState({ session });
+            };
         };
     };
 
-    render(){
-        return(<div>
+    incrementBreak = () => {
+        if (!this.state.running) {
+            const breakTime = this.state.breakTime + 1;
+            this.setState({ breakTime });
+        };
+    };
 
-        <h1 id="title">HIIT TIMER</h1>
+    decrementBreak = () => {
+        if (!this.state.running) {
+            const breakTime = this.state.breakTime - 1;
+            if (breakTime >= 0) {
+                this.setState({ breakTime });
+            };
+        };
+    };
 
-        <div id='container'>
+    incrementRepeat = () => {
+        if (!this.state.running) {
+            const repeat = this.state.repeat + 1;
+            this.setState({ repeat });
+        }
+    };
 
-            <div id="parameters">
-                <div id="session">
-                    <h2>Session</h2>
-                    <button className="btn btn-decrement" id="session-decrement" onClick={this.decrementSession}>↓</button>
-                    {this.state.session}'
-                    <button className="btn btn-increment" id="session-increment" onClick={this.incrementSession}>↑</button>
-                </div>
+    decrementRepeat = () => {
+        if (!this.state.running) {
+            const repeat = this.state.repeat - 1;
+            if (repeat > 0) {
+                this.setState({ repeat });
+            };
+        };
+    };
 
-                <div id="break">
-                    <h2>Break</h2>
-                    <button className="btn btn-decrement" id="break-decrement" onClick={this.decrementBreak}>↓</button>
-                    {this.state.break}'
-                    <button className="btn btn-increment" id="break-increment" onClick={this.incrementBreak}>↑</button>
-                </div>
+    // Fonctions du timer
 
-                <div id="repeat">
-                    <h2>Repeat</h2>
-                    <button className="btn btn-decrement" id="repeat-decrement" onClick={this.decrementRepeat}>↓</button>
-                    x {this.state.repeat}
-                    <button className="btn btn-increment" id="repeat-increment" onClick={this.incrementRepeat}>↑</button>
+    initialize = (seconds, step, turn) => {
+        this.setState({
+            running: false,
+            seconds,
+            step,
+            millis: 10,
+            turn,
+        });
+    };
+
+    handlePlayPause = () => {
+        const running = !this.state.running;
+        if (running) {
+            this.handleStart();
+        } else {
+            this.handleStop();
+        };
+    };
+
+    handleStart = () => {
+        if (this.state.step === "session") {
+            this.styleSession();
+        } else {
+            this.styleBreak();
+        }
+        this.interval = setInterval(() => {
+            this.tick();
+        }, 100);
+        this.setState({ running: true });
+    };
+
+    handleStop = () => {
+        this.stylePause();
+        clearInterval(this.interval);
+        this.setState({ running: false });
+    };
+
+    tick = () => {
+        let millis = this.state.millis - 1;
+        let seconds = this.state.seconds;
+        if (millis === 0) {
+            millis = 10;
+            seconds -= 1;
+        };
+        this.update(millis, seconds);
+    };
+
+    update = (millis, seconds) => {
+        if (seconds === 3 && millis === 10){
+            this.playBeep();
+            this.styleLastSeconds();
+        };
+        if (seconds === 0) {
+            this.handleStop();
+            if (this.state.step === 'session') {
+                this.nextStep();
+                this.styleBreak();
+            } else {
+                this.nextTurn();
+            };
+        } else {
+            this.setState({
+                millis,
+                seconds
+            });
+        };
+    };
+
+    playBeep = () => {
+        document.getElementById('beep').play();
+    };
+
+    nextStep = () => {
+        this.initialize(this.state.breakTime, 'break', this.state.turn);
+        this.handleStart();
+    };
+
+    nextTurn = () => {
+        const turn = this.state.turn + 1
+        if (turn - 1 < this.state.repeat) {
+            this.styleSession();
+            this.initialize(this.state.session, "session", turn)
+            this.handleStart();
+            this.setState({
+                turn
+            });
+        } else {
+            this.finishHit();
+        };
+    };
+
+    finishHit = () => {
+        this.styleFinish();
+        this.setState({finish: true})
+    }
+
+    reinitialize = () => {
+        this.handleStop();
+        this.styleInitial();
+        this.initialize(this.state.session, "session", 1);
+        this.setState({
+            finish: false
+        });
+    };
+
+    //Fonctions de style
+
+    styleInitial = () => {
+        document.getElementById("timer").className = "time-initial";
+    }
+
+    styleSession = () => {
+        document.getElementById("timer").className = "time-session";
+    };
+
+    styleBreak = () => {
+        document.getElementById("timer").className = "time-break";
+    };
+
+    stylePause = () => {
+        document.getElementById("timer").className = "time-pause";
+    };
+
+    styleLastSeconds = () => {
+        document.getElementById("timer").className = "time-last-seconds";
+    };
+
+    styleFinish = () => {
+        document.getElementById("timer").className = "time-finish";
+    }
+
+    render() {
+        return (
+            <div id="container">
+                <h1 id="title">HIIT TIMER</h1>
+                <div id="hit-timer">
+                    <HitParameters
+                        session={this.state.session}
+                        breakTime={this.state.breakTime}
+                        repeat={this.state.repeat}
+                        incrementSession={this.incrementSession}
+                        incrementBreak={this.incrementBreak}
+                        incrementRepeat={this.incrementRepeat}
+                        decrementSession={this.decrementSession}
+                        decrementBreak={this.decrementBreak}
+                        decrementRepeat={this.decrementRepeat}
+                    />
+                    <Timer
+                        step={this.state.step}
+                        turn={this.state.turn}
+                        seconds={this.state.seconds}
+                        millis={this.state.millis}
+                        handlePlayPause={this.handlePlayPause}
+                        reinitialize={this.reinitialize}
+                        finish={this.state.finish}
+                    />
                 </div>
             </div>
 
-            <div id="chrono">
-                <Timer
-                    break={this.state.break}
-                    session={this.state.session}
-                    repeat={this.state.repeat}
-                />
-            </div>
-
-        </div>
-        </div>);
+        );
     };
 };
 
